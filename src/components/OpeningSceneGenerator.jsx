@@ -42,12 +42,12 @@ export default function OpeningSceneGenerator() {
       <div className="gen-block gen-block--skipped">
         <div className="gen-block__header">
           <h3>Opening Scene</h3>
-          <div className="gen-block__header-right">
-            <GenerationModeToggle modeKey="openingScene" compact />
-            <button type="button" className="btn btn-link" onClick={handleTryAgain}>Try again</button>
-          </div>
+          <button type="button" className="btn btn-link" onClick={handleTryAgain}>Try again</button>
         </div>
         <p className="skipped-note">— Skipped —</p>
+        <div className="gen-block__footer">
+          <GenerationModeToggle modeKey="openingScene" compact />
+        </div>
       </div>
     );
   }
@@ -59,19 +59,16 @@ export default function OpeningSceneGenerator() {
           <h3>Opening Scene <span className="badge-optional">optional</span></h3>
           <p className="gen-block__hint">A few paragraphs of prose to kick the story off, drawn from everything you've built so far.</p>
         </div>
-        <div className="gen-block__header-right">
-          <GenerationModeToggle modeKey="openingScene" compact />
-          {isSet && (
-            <div className="gen-block__actions">
-              <button type="button" className="btn btn-ghost-small" onClick={handleGenerate} disabled={loading}>
-                {loading ? 'Writing…' : 'Regenerate'}
-              </button>
-              <button type="button" className="btn btn-ghost-small" onClick={handleSkip} disabled={loading}>
-                Clear
-              </button>
-            </div>
-          )}
-        </div>
+        {isSet && (
+          <div className="gen-block__actions">
+            <button type="button" className="btn btn-ghost-small" onClick={handleGenerate} disabled={loading}>
+              {loading ? 'Writing…' : 'Regenerate'}
+            </button>
+            <button type="button" className="btn btn-ghost-small" onClick={handleSkip} disabled={loading}>
+              Clear
+            </button>
+          </div>
+        )}
       </div>
 
       {!isSet && !loading && (
@@ -88,17 +85,23 @@ export default function OpeningSceneGenerator() {
       {loading && <div className="gen-block__loading">✦ writing the first page…</div>}
 
       {isSet && !loading && (
-        <>
-          <textarea
-            className="opening-scene__textarea"
-            value={draftText}
-            onChange={(e) => handleSaveEdit(e.target.value)}
-            rows={10}
-          />
-          <p className="gen-block__source">
-            {locked.source === 'ai' ? '✦ AI generated' : '✦ Local template — flip the switch above for real AI prose'}
-          </p>
-        </>
+        <textarea
+          className="opening-scene__textarea"
+          value={draftText}
+          onChange={(e) => handleSaveEdit(e.target.value)}
+          rows={10}
+        />
+      )}
+
+      {!loading && (
+        <div className="gen-block__footer">
+          <GenerationModeToggle modeKey="openingScene" compact />
+          {isSet && (
+            <p className="gen-block__source">
+              {locked.source === 'ai' ? '✦ AI generated' : '✦ Local template — flip the switch above for real AI prose'}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

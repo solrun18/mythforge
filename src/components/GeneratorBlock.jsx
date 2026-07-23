@@ -19,6 +19,8 @@ import { useGenerationMode } from '../context/GenerationModeContext.jsx';
 //
 // Generation mode (Local/AI) is scoped to this field's own `category` —
 // every field has its own independent switch, not a shared step-level one.
+// The switch lives bottom-right of the block, right above the small
+// "source" line that reports what actually generated the last batch.
 export default function GeneratorBlock({ section, field, category, count = 4 }) {
   const worldBible = useWorldBible();
   const { lockField } = useWorldBibleActions();
@@ -77,12 +79,12 @@ export default function GeneratorBlock({ section, field, category, count = 4 }) 
       <div className="gen-block gen-block--skipped">
         <div className="gen-block__header">
           <h3>{meta.label}</h3>
-          <div className="gen-block__header-right">
-            <GenerationModeToggle modeKey={category} compact />
-            <button type="button" className="btn btn-link" onClick={handleChange}>Try again</button>
-          </div>
+          <button type="button" className="btn btn-link" onClick={handleChange}>Try again</button>
         </div>
         <p className="skipped-note">— Skipped —</p>
+        <div className="gen-block__footer">
+          <GenerationModeToggle modeKey={category} compact />
+        </div>
       </div>
     );
   }
@@ -92,14 +94,14 @@ export default function GeneratorBlock({ section, field, category, count = 4 }) 
       <div className="gen-block gen-block--locked">
         <div className="gen-block__header">
           <h3>{meta.label}</h3>
-          <div className="gen-block__header-right">
-            <GenerationModeToggle modeKey={category} compact />
-            <button type="button" className="btn btn-link" onClick={handleChange}>Change</button>
-          </div>
+          <button type="button" className="btn btn-link" onClick={handleChange}>Change</button>
         </div>
         <div className="locked-summary">
           <h4>{locked.title}</h4>
           <p>{locked.description}</p>
+        </div>
+        <div className="gen-block__footer">
+          <GenerationModeToggle modeKey={category} compact />
         </div>
       </div>
     );
@@ -113,19 +115,16 @@ export default function GeneratorBlock({ section, field, category, count = 4 }) 
           <p className="gen-block__hint">{meta.hint}</p>
         </div>
         {!selected && (
-          <div className="gen-block__header-right">
-            <GenerationModeToggle modeKey={category} compact />
-            <div className="gen-block__actions">
-              <button type="button" className="btn btn-ghost-small" onClick={runGenerate} disabled={loading}>
-                {loading ? 'Conjuring…' : 'Reroll'}
-              </button>
-              <button type="button" className="btn btn-ghost-small" onClick={handleRandomize} disabled={loading || !options.length}>
-                Surprise me
-              </button>
-              <button type="button" className="btn btn-ghost-small" onClick={handleSkip} disabled={loading}>
-                Skip
-              </button>
-            </div>
+          <div className="gen-block__actions">
+            <button type="button" className="btn btn-ghost-small" onClick={runGenerate} disabled={loading}>
+              {loading ? 'Conjuring…' : 'Reroll'}
+            </button>
+            <button type="button" className="btn btn-ghost-small" onClick={handleRandomize} disabled={loading || !options.length}>
+              Surprise me
+            </button>
+            <button type="button" className="btn btn-ghost-small" onClick={handleSkip} disabled={loading}>
+              Skip
+            </button>
           </div>
         )}
       </div>
@@ -139,9 +138,12 @@ export default function GeneratorBlock({ section, field, category, count = 4 }) 
               <OptionCard key={opt.id} option={opt} isSelected={false} onSelect={handleSelect} />
             ))}
           </div>
-          <p className="gen-block__source">
-            {source === 'ai' ? '✦ AI generated' : '✦ Local roll — flip the switch above to AI'}
-          </p>
+          <div className="gen-block__footer">
+            <GenerationModeToggle modeKey={category} compact />
+            <p className="gen-block__source">
+              {source === 'ai' ? '✦ AI generated' : '✦ Local roll — flip the switch above to AI'}
+            </p>
+          </div>
         </>
       )}
 

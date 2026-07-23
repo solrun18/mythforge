@@ -36,7 +36,7 @@ function AppShell() {
         </p>
       </header>
 
-      <ProgressSteps current={step} />
+      <ProgressSteps current={step} onNavigate={setStep} />
 
       <main className="app-main">
         {step === STEP_WORLD && <StepWorldBuilding onContinue={() => setStep(STEP_MAP)} />}

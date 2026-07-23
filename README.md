@@ -13,7 +13,7 @@ Full guided flow now implemented per the [blueprint](./BLUEPRINT.md): World Buil
 
 **Story Kit summary + Markdown export** now includes the map image, named locations, and character portraits (embedded as base64 images in the exported `.md` — expect a few MB if you generated several images).
 
-**Local / AI toggle, per individual generator.** Every single field, portrait, the map, and the opening scene each has its own compact switch right in its own header, defaulting to **Local**. There's no global switch and no step-level switch — granularity is per category:
+**Local / AI toggle, per individual generator.** Every single field, portrait, the map, and the opening scene each has its own compact switch, defaulting to **Local**. The switch sits bottom-right of its block, right above the "✦ AI generated" / "✦ Local roll…" text announcing which mode produced what's on screen. There's no global switch and no step-level switch — granularity is per category:
 
 - World Building: 6 separate switches (Premise, Geography, Peoples, Origin Myth, Historical Event, Government).
 - Magic System: 4 switches (Source, Access, Costs, Attitude) — the Hard/Soft picker itself has no switch since it's a fixed choice, not generated.

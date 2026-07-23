@@ -47,7 +47,6 @@ export default function PortraitGenerator({ role, roleLabel }) {
       )}
       <h4>{character.title}</h4>
       <p className="gen-block__hint">{roleLabel}</p>
-      <GenerationModeToggle modeKey={`portrait_${role}`} compact />
       <button
         type="button"
         className="btn btn-ghost-small"
@@ -57,7 +56,10 @@ export default function PortraitGenerator({ role, roleLabel }) {
       >
         {loading ? 'Painting…' : mode === 'local' ? 'Needs AI' : hasPortrait ? 'Regenerate' : 'Generate Portrait'}
       </button>
-      {isUnavailable && mode === 'ai' && <p className="gen-block__source">Add OPENAI_API_KEY to generate portraits</p>}
+      <div className="gen-block__footer gen-block__footer--center">
+        <GenerationModeToggle modeKey={`portrait_${role}`} compact />
+        {isUnavailable && mode === 'ai' && <p className="gen-block__source">Add OPENAI_API_KEY to generate portraits</p>}
+      </div>
     </div>
   );
 }

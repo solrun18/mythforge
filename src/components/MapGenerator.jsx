@@ -67,20 +67,17 @@ export default function MapGenerator() {
           <h3>World Map</h3>
           <p className="gen-block__hint">Detailed, realistic style — seeded from your world premise and geography.</p>
         </div>
-        <div className="gen-block__header-right">
-          <GenerationModeToggle modeKey="map" compact />
-          {hasImage && (
-            <button
-              type="button"
-              className="btn btn-ghost-small"
-              onClick={handleGenerate}
-              disabled={loading || mode === 'local'}
-              title={mode === 'local' ? 'Switch to AI to regenerate' : undefined}
-            >
-              {loading ? 'Drawing…' : 'Regenerate'}
-            </button>
-          )}
-        </div>
+        {hasImage && (
+          <button
+            type="button"
+            className="btn btn-ghost-small"
+            onClick={handleGenerate}
+            disabled={loading || mode === 'local'}
+            title={mode === 'local' ? 'Switch to AI to regenerate' : undefined}
+          >
+            {loading ? 'Drawing…' : 'Regenerate'}
+          </button>
+        )}
       </div>
 
       {!hasImage && !loading && (
@@ -99,14 +96,18 @@ export default function MapGenerator() {
       {loading && <div className="gen-block__loading">✦ drawing the map…</div>}
 
       {!loading && hasImage && (
-        <>
-          <img className="map-image" src={map.imageDataUrl} alt="Generated world map" />
-          <p className="gen-block__source">✦ AI generated</p>
-        </>
+        <img className="map-image" src={map.imageDataUrl} alt="Generated world map" />
       )}
 
       {!loading && isUnavailable && (
         <div className="image-placeholder" dangerouslySetInnerHTML={{ __html: MAP_PLACEHOLDER_SVG }} />
+      )}
+
+      {!loading && (
+        <div className="gen-block__footer">
+          <GenerationModeToggle modeKey="map" compact />
+          {hasImage && <p className="gen-block__source">✦ AI generated</p>}
+        </div>
       )}
 
       <div className="location-list">
