@@ -1,4 +1,4 @@
-# Mythforge — Phase 2 complete
+# Mythforge — Phase 3 complete
 
 Full guided flow now implemented per the [blueprint](./BLUEPRINT.md): World Building → Map → Magic System → Characters → Portraits → Plot Points → Opening Scene (bonus) → Story Kit summary/export.
 
@@ -26,12 +26,32 @@ Full guided flow now implemented per the [blueprint](./BLUEPRINT.md): World Buil
 
 Every switch is fully independent — you could, for instance, AI-roll just the Protagonist field and its portrait while everything else in the app stays on Local. Switching a field's mode only affects that field's next generation — it doesn't retroactively change something already locked in, and it doesn't auto-regenerate cards already on screen. Image "Regenerate" buttons are disabled while their own switch is on Local, so a stray click can't wipe out a real AI-generated image with a placeholder.
 
+## Art direction pass (Phase 3)
+
+- **Hero illustration** — a small, human-proportioned silhouette in the header (`src/components/decor/HeroFigure.jsx`): a static torso/bodice with a three-layer flowing skirt below the waist that sways independently in CSS for a cloth-sim feel, plus drifting hair strands. Tilts a couple degrees as you scroll, as a light touch of the "reacts to cursor/scroll" motion from the blueprint, without a full parallax rig.
+- **Background scene** (`BackgroundScene.jsx`) — a fixed, full-viewport layer behind the app content: twinkling glitter particles, an owl/stag/fox as quiet background fauna, and the moth roaming a wide 34s loop across the whole screen instead of sitting pinned by the header. Cards and panels have their own opaque backgrounds, so all of this shows through in the page margins and gaps around them rather than over readable content. Tuned for render performance: no blurred box-shadows, literal SVG transform-origins instead of `transform-box: fill-box` (which forces a per-frame bounding-box recompute), the scroll-tilt effect is batched to one write per animation frame, and — since a fast scroll is the one moment ~20 looping background animations are guaranteed to go unnoticed — an `is-scrolling` class pauses all of them for as long as you're actively scrolling, resuming ~200ms after you stop.
+- **Vine dividers** — grow in above/below the main content on load, a recurring flora motif alongside the fauna.
+- **Page-turn transitions** — each step's content rotates and fades in from the left when you navigate (forward, back, or via the clickable roadmap), giving the wizard a storybook feel and doubling as a progress cue.
+- **Card refinements** — the tarot-card option cards now get a soft gold glow on hover, on top of the existing ornamented corners.
+- All the new motion respects `prefers-reduced-motion`.
+
+## Story Kit export
+
+The final screen offers two export options:
+
+- **Export as PDF** (primary) — a dedicated, hidden print layout (`StoryKitPrintSheet.jsx`) is rendered off-screen at a fixed width with one uniform font size and tight spacing, then captured block-by-block and packed onto A4 pages — page breaks only ever fall between blocks, never mid-paragraph, and the whole kit is designed to fit on a single page where the content allows. Keeps the app's jewel-tone/gold art direction rather than a plain text dump. Uses `jspdf` + `html2canvas-pro`, loaded on demand only when you click the button, no server call.
+- **Export as Markdown** — the original plain-text export, still there for anyone who wants raw text to paste elsewhere.
+
+Both embed portrait/map images directly, so files can run a few MB if you generated several AI images.
+
 ## Setup
 
 ```
 npm install
 npm run dev
 ```
+
+New dependencies were added for the PDF export (`jspdf`, `html2canvas-pro`) — run `npm install` again after pulling this update to fetch them.
 
 Copy `.env.example` to `.env` and add your own keys to unlock real generation:
 
@@ -63,7 +83,7 @@ Same as before — push to GitHub, Vercel auto-detects Vite + the `/api` functio
 
 ## Verification note
 
-Built and edited directly in your actual `Claude Projects/mythforge` folder, using the `node_modules` already installed there — so each round has been a real `npm run build`, not just syntax checks. Latest build: 43 modules, no errors. Still worth a `npm run dev` pass on your end to click through a few switches and confirm the granularity feels right.
+Built and edited directly in your actual `Claude Projects/mythforge` folder, using the `node_modules` already installed there — so each round has been a real `npm run build`, not just syntax checks. The PDF export round is the exception: `jspdf`/`html2canvas-pro` aren't in your `node_modules` yet (npm's registry isn't reachable from my sandbox), so I verified everything else builds clean (44 modules) and the only failure is the expected "can't resolve jspdf" one. Run `npm install` on your end, then `npm run build` once to confirm, and click "Export as PDF" on the Story Kit screen to check the output.
 
 ## Known limitations
 

@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { WorldBibleProvider } from './context/WorldBibleContext.jsx';
 import { GenerationModeProvider } from './context/GenerationModeContext.jsx';
 import ProgressSteps from './components/ProgressSteps.jsx';
+import HeroFigure from './components/decor/HeroFigure.jsx';
+import { VineDivider } from './components/decor/FaunaAccents.jsx';
+import BackgroundScene from './components/decor/BackgroundScene.jsx';
 import StepWorldBuilding from './steps/StepWorldBuilding.jsx';
 import StepMap from './steps/StepMap.jsx';
 import StepMagicSystem from './steps/StepMagicSystem.jsx';
@@ -23,55 +26,111 @@ const STEP_SUMMARY = 7;
 function AppShell() {
   const [step, setStep] = useState(STEP_WORLD);
 
+  // Subtle scroll-linked tilt on the hero illustration's cloak — a light
+  // touch of the "reacting to cursor/scroll" motion called for in the
+  // blueprint's art direction, without a full parallax/mouse-tracking rig.
+  // Scroll events can fire many times per frame, so the actual style
+  // write is batched to at most once per animation frame via rAF.
+  //
+  // Separately: a fast scroll is the one moment the ~20 looping
+  // decorative animations (glitter, fauna, moth, hero sway) are
+  // guaranteed to go unnoticed, and it's also exactly when the main
+  // thread is busiest — so an "is-scrolling" class pauses all of them
+  // (see App.css) for as long as scrolling is actually happening, and
+  // they resume ~200ms after it stops. That trades motion nobody can
+  // see for a scroll that stays smooth.
+  useEffect(() => {
+    let ticking = false;
+    let scrollStopTimer;
+    function applyTilt() {
+      const tilt = Math.max(-3, Math.min(3, window.scrollY / 40));
+      document.documentElement.style.setProperty('--scroll-tilt', `${tilt}deg`);
+      ticking = false;
+    }
+    function handleScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(applyTilt);
+        ticking = true;
+      }
+      document.documentElement.classList.add('is-scrolling');
+      clearTimeout(scrollStopTimer);
+      scrollStopTimer = setTimeout(() => {
+        document.documentElement.classList.remove('is-scrolling');
+      }, 200);
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollStopTimer);
+      document.documentElement.classList.remove('is-scrolling');
+    };
+  }, []);
+
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <p className="app-header__eyebrow">✦ Mythforge ✦</p>
-        <h1>Build a world worth writing.</h1>
-        <p className="app-header__sub">
-          A guided high-fantasy generator. Pick your way through worldbuilding, a map, magic,
-          characters and their portraits, and plot — every choice is suggested, but you decide
-          what stays, what gets skipped, what gets left to chance, and whether each step rolls
-          locally or with AI.
-        </p>
-      </header>
+    <>
+      <BackgroundScene />
+      <div className="app-shell">
+        <header className="app-header">
+          <div className="app-header__hero">
+            <HeroFigure />
+          </div>
+          <p className="app-header__eyebrow">✦ Mythforge ✦</p>
+          <h1>Build a world worth writing.</h1>
+          <p className="app-header__sub">
+            A guided high-fantasy generator. Pick your way through worldbuilding, a map, magic,
+            characters and their portraits, and plot — every choice is suggested, but you decide
+            what stays, what gets skipped, what gets left to chance, and whether each step rolls
+            locally or with AI.
+          </p>
+        </header>
 
-      <ProgressSteps current={step} onNavigate={setStep} />
+        <VineDivider className="app-divider" />
 
-      <main className="app-main">
-        {step === STEP_WORLD && <StepWorldBuilding onContinue={() => setStep(STEP_MAP)} />}
-        {step === STEP_MAP && (
-          <StepMap onContinue={() => setStep(STEP_MAGIC)} onBack={() => setStep(STEP_WORLD)} />
-        )}
-        {step === STEP_MAGIC && (
-          <StepMagicSystem onContinue={() => setStep(STEP_CHARACTERS)} onBack={() => setStep(STEP_MAP)} />
-        )}
-        {step === STEP_CHARACTERS && (
-          <StepCharacters onContinue={() => setStep(STEP_PORTRAITS)} onBack={() => setStep(STEP_MAGIC)} />
-        )}
-        {step === STEP_PORTRAITS && (
-          <StepPortraits onContinue={() => setStep(STEP_PLOT)} onBack={() => setStep(STEP_CHARACTERS)} />
-        )}
-        {step === STEP_PLOT && (
-          <StepPlot onContinue={() => setStep(STEP_SCENE)} onBack={() => setStep(STEP_PORTRAITS)} />
-        )}
-        {step === STEP_SCENE && (
-          <StepOpeningScene onContinue={() => setStep(STEP_SUMMARY)} onBack={() => setStep(STEP_PLOT)} />
-        )}
-        {step === STEP_SUMMARY && (
-          <StepSummary onBack={() => setStep(STEP_SCENE)} onStartFresh={() => setStep(STEP_WORLD)} />
-        )}
-      </main>
+        <ProgressSteps current={step} onNavigate={setStep} />
 
-      <footer className="app-footer">
-        <p>Mythforge — a personal creative-inspiration tool. Nothing here is saved once you leave.</p>
-        <div className="app-footer__about">
-          <span className="app-footer__credit">Made by Sólrún</span>
-          <a href="mailto:solrunasta@hotmail.com">✉ solrunasta@hotmail.com</a>
-          <a href="https://is.linkedin.com/in/solrunasta" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
-        </div>
-      </footer>
-    </div>
+        <main className="app-main">
+          <div key={step} className="step-page">
+            {step === STEP_WORLD && <StepWorldBuilding onContinue={() => setStep(STEP_MAP)} />}
+            {step === STEP_MAP && (
+              <StepMap onContinue={() => setStep(STEP_MAGIC)} onBack={() => setStep(STEP_WORLD)} />
+            )}
+            {step === STEP_MAGIC && (
+              <StepMagicSystem onContinue={() => setStep(STEP_CHARACTERS)} onBack={() => setStep(STEP_MAP)} />
+            )}
+            {step === STEP_CHARACTERS && (
+              <StepCharacters onContinue={() => setStep(STEP_PORTRAITS)} onBack={() => setStep(STEP_MAGIC)} />
+            )}
+            {step === STEP_PORTRAITS && (
+              <StepPortraits onContinue={() => setStep(STEP_PLOT)} onBack={() => setStep(STEP_CHARACTERS)} />
+            )}
+            {step === STEP_PLOT && (
+              <StepPlot onContinue={() => setStep(STEP_SCENE)} onBack={() => setStep(STEP_PORTRAITS)} />
+            )}
+            {step === STEP_SCENE && (
+              <StepOpeningScene onContinue={() => setStep(STEP_SUMMARY)} onBack={() => setStep(STEP_PLOT)} />
+            )}
+            {step === STEP_SUMMARY && (
+              <StepSummary onBack={() => setStep(STEP_SCENE)} onStartFresh={() => setStep(STEP_WORLD)} />
+            )}
+          </div>
+        </main>
+
+        <VineDivider className="app-divider app-divider--footer" />
+
+        <footer className="app-footer">
+          <p>Mythforge — a personal creative-inspiration tool. Nothing here is saved once you leave.</p>
+          <div className="app-footer__about">
+            <img src="/profile.png" alt="Sólrún" className="app-footer__photo" />
+            <div className="app-footer__about-text">
+              <span className="app-footer__credit">Made by Sólrún</span>
+              </div><div className="app-footer__about-text">
+              <a href="mailto:solrunasta@hotmail.com">✉ solrunasta@hotmail.com</a>
+              <a href="https://is.linkedin.com/in/solrunasta" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </>
   );
 }
 
