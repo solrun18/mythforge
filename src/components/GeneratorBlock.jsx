@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import OptionCard from './OptionCard.jsx';
+import GenerationModeToggle from './GenerationModeToggle.jsx';
 import { generateOptions } from '../lib/generateClient.js';
 import { CATEGORY_META } from '../data/library.js';
 import { SKIPPED } from '../lib/constants.js';
 import { useWorldBible, useWorldBibleActions } from '../context/WorldBibleContext.jsx';
+import { useGenerationMode } from '../context/GenerationModeContext.jsx';
 
 // The core "generate -> present -> select, randomize, or skip -> lock in"
 // loop, reused for every world-building, magic-system, character, and
@@ -14,9 +16,13 @@ import { useWorldBible, useWorldBibleActions } from '../context/WorldBibleContex
 //   - Explicitly skipped (SKIPPED sentinel) — shown as its own quiet state
 //   - Left in-progress — if the user never acts on it, it's just absent
 //     from the World Bible. No field is ever auto-filled with a default.
+//
+// Generation mode (Local/AI) is scoped to this field's own `category` —
+// every field has its own independent switch, not a shared step-level one.
 export default function GeneratorBlock({ section, field, category, count = 4 }) {
   const worldBible = useWorldBible();
   const { lockField } = useWorldBibleActions();
+  const { mode } = useGenerationMode(category);
   const meta = CATEGORY_META[category];
   const locked = worldBible[section][field];
   const isSkipped = locked === SKIPPED;
@@ -31,7 +37,7 @@ export default function GeneratorBlock({ section, field, category, count = 4 }) 
   async function runGenerate() {
     setLoading(true);
     setSelected(null);
-    const { options: opts, source: src } = await generateOptions(category, worldBible, count);
+    const { options: opts, source: src } = await generateOptions(category, worldBible, count, mode);
     setOptions(opts);
     setSource(src);
     setLoading(false);
@@ -71,7 +77,10 @@ export default function GeneratorBlock({ section, field, category, count = 4 }) 
       <div className="gen-block gen-block--skipped">
         <div className="gen-block__header">
           <h3>{meta.label}</h3>
-          <button type="button" className="btn btn-link" onClick={handleChange}>Try again</button>
+          <div className="gen-block__header-right">
+            <GenerationModeToggle modeKey={category} compact />
+            <button type="button" className="btn btn-link" onClick={handleChange}>Try again</button>
+          </div>
         </div>
         <p className="skipped-note">— Skipped —</p>
       </div>
@@ -83,7 +92,10 @@ export default function GeneratorBlock({ section, field, category, count = 4 }) 
       <div className="gen-block gen-block--locked">
         <div className="gen-block__header">
           <h3>{meta.label}</h3>
-          <button type="button" className="btn btn-link" onClick={handleChange}>Change</button>
+          <div className="gen-block__header-right">
+            <GenerationModeToggle modeKey={category} compact />
+            <button type="button" className="btn btn-link" onClick={handleChange}>Change</button>
+          </div>
         </div>
         <div className="locked-summary">
           <h4>{locked.title}</h4>
@@ -101,16 +113,19 @@ export default function GeneratorBlock({ section, field, category, count = 4 }) 
           <p className="gen-block__hint">{meta.hint}</p>
         </div>
         {!selected && (
-          <div className="gen-block__actions">
-            <button type="button" className="btn btn-ghost-small" onClick={runGenerate} disabled={loading}>
-              {loading ? 'Conjuring…' : 'Reroll'}
-            </button>
-            <button type="button" className="btn btn-ghost-small" onClick={handleRandomize} disabled={loading || !options.length}>
-              Surprise me
-            </button>
-            <button type="button" className="btn btn-ghost-small" onClick={handleSkip} disabled={loading}>
-              Skip
-            </button>
+          <div className="gen-block__header-right">
+            <GenerationModeToggle modeKey={category} compact />
+            <div className="gen-block__actions">
+              <button type="button" className="btn btn-ghost-small" onClick={runGenerate} disabled={loading}>
+                {loading ? 'Conjuring…' : 'Reroll'}
+              </button>
+              <button type="button" className="btn btn-ghost-small" onClick={handleRandomize} disabled={loading || !options.length}>
+                Surprise me
+              </button>
+              <button type="button" className="btn btn-ghost-small" onClick={handleSkip} disabled={loading}>
+                Skip
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -125,7 +140,7 @@ export default function GeneratorBlock({ section, field, category, count = 4 }) 
             ))}
           </div>
           <p className="gen-block__source">
-            {source === 'ai' ? '✦ AI generated' : '✦ Local roll (add an API key for AI generation)'}
+            {source === 'ai' ? '✦ AI generated' : '✦ Local roll — flip the switch above to AI'}
           </p>
         </>
       )}

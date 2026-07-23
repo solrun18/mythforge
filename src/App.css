@@ -131,6 +131,70 @@ button {
   gap: 16px;
   margin-bottom: 14px;
 }
+/* Generation mode toggle — one per generator instance (field/portrait/
+   map/opening scene), usually rendered inline in that block's header. */
+.mode-toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.mode-toggle-wrap__label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.mode-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+  background: rgba(18, 12, 34, 0.4);
+}
+.mode-toggle__option {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 8px 18px;
+  border-radius: 999px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.mode-toggle__option:hover { color: var(--parchment); }
+.mode-toggle__option--active {
+  background: linear-gradient(120deg, var(--gold), var(--gold-bright));
+  color: var(--bg-deep);
+  font-weight: 700;
+}
+.mode-toggle__option--active:hover { color: var(--bg-deep); }
+
+/* Compact variant — sized to sit inline in a gen-block header or a
+   narrow portrait card, where a full-size toggle would overwhelm. */
+.mode-toggle-wrap--compact { gap: 6px; margin: 6px 0; }
+.mode-toggle--compact { padding: 2px; gap: 2px; }
+.mode-toggle--compact .mode-toggle__option {
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  letter-spacing: 0.03em;
+}
+
+/* Wraps the per-block toggle + action buttons together on the right side
+   of a gen-block header, so they stack sanely on narrow screens. */
+.gen-block__header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .gen-block__header h3 { font-size: 1.15rem; }
 .gen-block__hint { color: var(--muted); font-size: 0.9rem; margin: 4px 0 0; }
 .gen-block__loading { color: var(--gold); font-style: italic; padding: 20px 0; text-align: center; }

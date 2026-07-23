@@ -2,7 +2,14 @@
 // generators, there's no meaningful "local fallback" for an actual image —
 // instead, callers should show one of the static placeholder graphics
 // (src/assets/*.svg) when source === 'unavailable'.
-export async function generateImage(prompt, size = '1024x1024') {
+//
+// In 'local' mode (the default), we skip the paid API call entirely and
+// go straight to 'unavailable' so the placeholder shows immediately —
+// image generation only ever happens when the user flips to 'ai' mode.
+export async function generateImage(prompt, size = '1024x1024', mode = 'local') {
+  if (mode === 'local') {
+    return { source: 'unavailable' };
+  }
   try {
     const res = await fetch('/api/generate-image', {
       method: 'POST',

@@ -3,6 +3,8 @@ import { generateImage } from '../lib/imageClient.js';
 import { MAP_PLACEHOLDER_SVG } from '../assets/mapPlaceholder.js';
 import { SKIPPED } from '../lib/constants.js';
 import { useWorldBible, useWorldBibleActions } from '../context/WorldBibleContext.jsx';
+import { useGenerationMode } from '../context/GenerationModeContext.jsx';
+import GenerationModeToggle from './GenerationModeToggle.jsx';
 
 function buildMapPrompt(worldBible) {
   const premise = worldBible.worldBuilding.premise;
@@ -21,6 +23,7 @@ function buildMapPrompt(worldBible) {
 export default function MapGenerator() {
   const worldBible = useWorldBible();
   const { lockField } = useWorldBibleActions();
+  const { mode } = useGenerationMode('map');
   const map = worldBible.map;
 
   const [loading, setLoading] = useState(false);
@@ -30,7 +33,7 @@ export default function MapGenerator() {
   async function handleGenerate() {
     setLoading(true);
     const prompt = buildMapPrompt(worldBible);
-    const result = await generateImage(prompt);
+    const result = await generateImage(prompt, '1024x1024', mode);
     if (result.source === 'ai') {
       lockField('map', 'imageDataUrl', result.imageDataUrl);
       lockField('map', 'prompt', prompt);
@@ -64,17 +67,31 @@ export default function MapGenerator() {
           <h3>World Map</h3>
           <p className="gen-block__hint">Detailed, realistic style — seeded from your world premise and geography.</p>
         </div>
-        {hasImage && (
-          <button type="button" className="btn btn-ghost-small" onClick={handleGenerate} disabled={loading}>
-            {loading ? 'Drawing…' : 'Regenerate'}
-          </button>
-        )}
+        <div className="gen-block__header-right">
+          <GenerationModeToggle modeKey="map" compact />
+          {hasImage && (
+            <button
+              type="button"
+              className="btn btn-ghost-small"
+              onClick={handleGenerate}
+              disabled={loading || mode === 'local'}
+              title={mode === 'local' ? 'Switch to AI to regenerate' : undefined}
+            >
+              {loading ? 'Drawing…' : 'Regenerate'}
+            </button>
+          )}
+        </div>
       </div>
 
       {!hasImage && !loading && (
         <div className="opening-scene__cta">
-          <button type="button" className="btn btn-primary-small" onClick={handleGenerate}>
-            Generate Map
+          <button
+            type="button"
+            className="btn btn-primary-small"
+            onClick={handleGenerate}
+            disabled={mode === 'local'}
+          >
+            {mode === 'local' ? 'Switch to AI to generate a map' : 'Generate Map'}
           </button>
         </div>
       )}

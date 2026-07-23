@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { WorldBibleProvider } from './context/WorldBibleContext.jsx';
+import { GenerationModeProvider } from './context/GenerationModeContext.jsx';
 import ProgressSteps from './components/ProgressSteps.jsx';
 import StepWorldBuilding from './steps/StepWorldBuilding.jsx';
 import StepMap from './steps/StepMap.jsx';
@@ -29,8 +30,9 @@ function AppShell() {
         <h1>Build a world worth writing.</h1>
         <p className="app-header__sub">
           A guided high-fantasy generator. Pick your way through worldbuilding, a map, magic,
-          characters and their portraits, and plot — every choice is AI-suggested, but you decide
-          what stays, what gets skipped, and what gets left to chance.
+          characters and their portraits, and plot — every choice is suggested, but you decide
+          what stays, what gets skipped, what gets left to chance, and whether each step rolls
+          locally or with AI.
         </p>
       </header>
 
@@ -75,8 +77,10 @@ function AppShell() {
 
 export default function App() {
   return (
-    <WorldBibleProvider>
-      <AppShell />
-    </WorldBibleProvider>
+    <GenerationModeProvider>
+      <WorldBibleProvider>
+        <AppShell />
+      </WorldBibleProvider>
+    </GenerationModeProvider>
   );
 }

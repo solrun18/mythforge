@@ -4,7 +4,15 @@ import { generateLocalOpeningScene } from './localOpeningScene.js';
 // Tries the AI-backed serverless endpoint first. If it's unavailable
 // (no API key configured, network error, bad response, etc.) it falls
 // back to the local template generator so the app never dead-ends.
-export async function generateOptions(category, context, count = 4) {
+//
+// `mode` is the user's chosen generation mode ('local' | 'ai') from the
+// header toggle. When it's 'local', we skip the network call entirely —
+// no cost, no latency, works offline. 'ai' keeps the old try-then-fallback
+// behavior as a safety net in case the API is unavailable.
+export async function generateOptions(category, context, count = 4, mode = 'local') {
+  if (mode === 'local') {
+    return { options: generateLocalOptions(category, count), source: 'local' };
+  }
   try {
     const res = await fetch('/api/generate', {
       method: 'POST',
@@ -28,7 +36,10 @@ export async function generateOptions(category, context, count = 4) {
 
 // Same fallback pattern, but for the opening-scene prose generator, which
 // returns a single block of text instead of a batch of option cards.
-export async function generateOpeningScene(worldBible) {
+export async function generateOpeningScene(worldBible, mode = 'local') {
+  if (mode === 'local') {
+    return { text: generateLocalOpeningScene(worldBible), source: 'local' };
+  }
   try {
     const res = await fetch('/api/generate', {
       method: 'POST',

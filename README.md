@@ -13,6 +13,19 @@ Full guided flow now implemented per the [blueprint](./BLUEPRINT.md): World Buil
 
 **Story Kit summary + Markdown export** now includes the map image, named locations, and character portraits (embedded as base64 images in the exported `.md` — expect a few MB if you generated several images).
 
+**Local / AI toggle, per individual generator.** Every single field, portrait, the map, and the opening scene each has its own compact switch right in its own header, defaulting to **Local**. There's no global switch and no step-level switch — granularity is per category:
+
+- World Building: 6 separate switches (Premise, Geography, Peoples, Origin Myth, Historical Event, Government).
+- Magic System: 4 switches (Source, Access, Costs, Attitude) — the Hard/Soft picker itself has no switch since it's a fixed choice, not generated.
+- Characters: 4 switches (Protagonist, Mentor, Rival/Love Interest, Antagonist).
+- Portraits: one switch per character card (so you can AI-roll the protagonist's portrait while leaving the others on Local).
+- Plot: 6 switches for the main beats, plus one more for each subplot arc you've selected.
+- Map: 1 switch. Opening Scene: 1 switch.
+- **Local** (default): text comes from the hand-written content library, images show the placeholder graphic — zero cost, zero setup, works offline.
+- **AI**: that specific field/portrait/etc. goes through Claude or OpenAI (using whichever keys you've configured — see below). If a key is missing or a call fails, it quietly falls back to local/placeholder rather than erroring.
+
+Every switch is fully independent — you could, for instance, AI-roll just the Protagonist field and its portrait while everything else in the app stays on Local. Switching a field's mode only affects that field's next generation — it doesn't retroactively change something already locked in, and it doesn't auto-regenerate cards already on screen. Image "Regenerate" buttons are disabled while their own switch is on Local, so a stray click can't wipe out a real AI-generated image with a placeholder.
+
 ## Setup
 
 ```
@@ -50,7 +63,7 @@ Same as before — push to GitHub, Vercel auto-detects Vite + the `/api` functio
 
 ## Verification note
 
-This was built and synced into your actual `Claude Projects/mythforge` folder, where `node_modules` was already present from your earlier `npm install` — so this time I could run a real `npm run build` (not just syntax checks) directly against it. It completed cleanly: 57 modules, no errors. Still worth a `npm run dev` pass on your end to click through the new Map and Portraits steps and confirm the UX feels right.
+Built and edited directly in your actual `Claude Projects/mythforge` folder, using the `node_modules` already installed there — so each round has been a real `npm run build`, not just syntax checks. Latest build: 43 modules, no errors. Still worth a `npm run dev` pass on your end to click through a few switches and confirm the granularity feels right.
 
 ## Known limitations
 

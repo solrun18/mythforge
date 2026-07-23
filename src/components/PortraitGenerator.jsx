@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { generateImage } from '../lib/imageClient.js';
 import { PORTRAIT_PLACEHOLDER_SVG } from '../assets/portraitPlaceholder.js';
 import { useWorldBible, useWorldBibleActions } from '../context/WorldBibleContext.jsx';
+import { useGenerationMode } from '../context/GenerationModeContext.jsx';
+import GenerationModeToggle from './GenerationModeToggle.jsx';
 
 function buildPortraitPrompt(character, roleLabel) {
   return (
@@ -15,6 +17,7 @@ function buildPortraitPrompt(character, roleLabel) {
 export default function PortraitGenerator({ role, roleLabel }) {
   const worldBible = useWorldBible();
   const { lockField } = useWorldBibleActions();
+  const { mode } = useGenerationMode(`portrait_${role}`);
   const character = worldBible.characters[role];
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +26,7 @@ export default function PortraitGenerator({ role, roleLabel }) {
   async function handleGenerate() {
     setLoading(true);
     const prompt = buildPortraitPrompt(character, roleLabel);
-    const result = await generateImage(prompt);
+    const result = await generateImage(prompt, '1024x1024', mode);
     if (result.source === 'ai') {
       lockField('characters', role, { ...character, portraitDataUrl: result.imageDataUrl, portraitSource: 'ai' });
     } else {
@@ -44,10 +47,17 @@ export default function PortraitGenerator({ role, roleLabel }) {
       )}
       <h4>{character.title}</h4>
       <p className="gen-block__hint">{roleLabel}</p>
-      <button type="button" className="btn btn-ghost-small" onClick={handleGenerate} disabled={loading}>
-        {loading ? 'Painting…' : hasPortrait ? 'Regenerate' : 'Generate Portrait'}
+      <GenerationModeToggle modeKey={`portrait_${role}`} compact />
+      <button
+        type="button"
+        className="btn btn-ghost-small"
+        onClick={handleGenerate}
+        disabled={loading || mode === 'local'}
+        title={mode === 'local' ? 'Switch to AI to generate' : undefined}
+      >
+        {loading ? 'Painting…' : mode === 'local' ? 'Needs AI' : hasPortrait ? 'Regenerate' : 'Generate Portrait'}
       </button>
-      {isUnavailable && <p className="gen-block__source">Add OPENAI_API_KEY to generate portraits</p>}
+      {isUnavailable && mode === 'ai' && <p className="gen-block__source">Add OPENAI_API_KEY to generate portraits</p>}
     </div>
   );
 }

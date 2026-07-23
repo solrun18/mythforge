@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { generateOpeningScene } from '../lib/generateClient.js';
 import { SKIPPED } from '../lib/constants.js';
 import { useWorldBible, useWorldBibleActions } from '../context/WorldBibleContext.jsx';
+import { useGenerationMode } from '../context/GenerationModeContext.jsx';
+import GenerationModeToggle from './GenerationModeToggle.jsx';
 
 export default function OpeningSceneGenerator() {
   const worldBible = useWorldBible();
   const { lockField } = useWorldBibleActions();
+  const { mode } = useGenerationMode('openingScene');
   const locked = worldBible.openingScene.scene;
   const isSkipped = locked === SKIPPED;
   const isSet = locked && !isSkipped;
@@ -15,7 +18,7 @@ export default function OpeningSceneGenerator() {
 
   async function handleGenerate() {
     setLoading(true);
-    const { text, source } = await generateOpeningScene(worldBible);
+    const { text, source } = await generateOpeningScene(worldBible, mode);
     setDraftText(text);
     lockField('openingScene', 'scene', { text, source });
     setLoading(false);
@@ -39,7 +42,10 @@ export default function OpeningSceneGenerator() {
       <div className="gen-block gen-block--skipped">
         <div className="gen-block__header">
           <h3>Opening Scene</h3>
-          <button type="button" className="btn btn-link" onClick={handleTryAgain}>Try again</button>
+          <div className="gen-block__header-right">
+            <GenerationModeToggle modeKey="openingScene" compact />
+            <button type="button" className="btn btn-link" onClick={handleTryAgain}>Try again</button>
+          </div>
         </div>
         <p className="skipped-note">— Skipped —</p>
       </div>
@@ -53,16 +59,19 @@ export default function OpeningSceneGenerator() {
           <h3>Opening Scene <span className="badge-optional">optional</span></h3>
           <p className="gen-block__hint">A few paragraphs of prose to kick the story off, drawn from everything you've built so far.</p>
         </div>
-        {isSet && (
-          <div className="gen-block__actions">
-            <button type="button" className="btn btn-ghost-small" onClick={handleGenerate} disabled={loading}>
-              {loading ? 'Writing…' : 'Regenerate'}
-            </button>
-            <button type="button" className="btn btn-ghost-small" onClick={handleSkip} disabled={loading}>
-              Clear
-            </button>
-          </div>
-        )}
+        <div className="gen-block__header-right">
+          <GenerationModeToggle modeKey="openingScene" compact />
+          {isSet && (
+            <div className="gen-block__actions">
+              <button type="button" className="btn btn-ghost-small" onClick={handleGenerate} disabled={loading}>
+                {loading ? 'Writing…' : 'Regenerate'}
+              </button>
+              <button type="button" className="btn btn-ghost-small" onClick={handleSkip} disabled={loading}>
+                Clear
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {!isSet && !loading && (
@@ -87,7 +96,7 @@ export default function OpeningSceneGenerator() {
             rows={10}
           />
           <p className="gen-block__source">
-            {locked.source === 'ai' ? '✦ AI generated' : '✦ Local template (add an API key for real AI prose)'}
+            {locked.source === 'ai' ? '✦ AI generated' : '✦ Local template — flip the switch above for real AI prose'}
           </p>
         </>
       )}
