@@ -17,10 +17,20 @@ gated on this.
 
 ## 2. Get your API keys
 
-In your project, go to **Project Settings → API**. You need two values:
+In your project, go to **Settings → API Keys**. You need two values:
 
 - **Project URL** → this is `VITE_SUPABASE_URL`
-- **anon / public key** → this is `VITE_SUPABASE_ANON_KEY`
+- **Publishable key** (starts with `sb_publishable_...`; on older projects this
+  may instead be called the **anon / public key**, a long JWT string starting
+  with `eyJ...`) → this is `VITE_SUPABASE_ANON_KEY`
+
+> ⚠️ Do **not** copy the **Secret key** (`sb_secret_...`, or the legacy
+> `service_role` key) into `VITE_SUPABASE_ANON_KEY`. That key bypasses all
+> Row Level Security and Supabase actively blocks it from being used in a
+> browser — you'll get a "Forbidden use of secret API key in browser" error
+> at signup if you do this. The publishable key is the one that's *meant*
+> to be public; it's kept safe by the RLS policies from step 3, not by
+> secrecy.
 
 Add both to your `.env` file (copy `.env.example` if you haven't already):
 

@@ -4,6 +4,7 @@ import { worldBibleToMarkdown, downloadMarkdown } from '../lib/exportWorldBible.
 import { exportBlocksAsPdf } from '../lib/exportPdf.js';
 import StoryKitPrintSheet from '../components/StoryKitPrintSheet.jsx';
 import Toast from '../components/Toast.jsx';
+import SaveWorldModal from '../components/SaveWorldModal.jsx';
 import AuthModal from '../components/auth/AuthModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { supabase } from '../lib/supabaseClient.js';
@@ -35,6 +36,7 @@ export default function StepSummary({ onBack, onStartFresh }) {
   const [pdfError, setPdfError] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [showSavedToast, setShowSavedToast] = useState(false);
@@ -60,12 +62,12 @@ export default function StepSummary({ onBack, onStartFresh }) {
     }
   }
 
-  async function saveWorld() {
+  async function saveWorld(name) {
     setSaving(true);
     setSaveError('');
     const { error } = await supabase.from('worlds').insert({
       user_id: user.id,
-      name: worldName,
+      name,
       world_bible: worldBible,
     });
     setSaving(false);
@@ -73,6 +75,7 @@ export default function StepSummary({ onBack, onStartFresh }) {
       setSaveError(error.message);
       return;
     }
+    setSaveModalOpen(false);
     setShowSavedToast(true);
     setTimeout(() => setShowSavedToast(false), 1600);
   }
@@ -83,16 +86,18 @@ export default function StepSummary({ onBack, onStartFresh }) {
       setAuthOpen(true);
       return;
     }
-    saveWorld();
+    setSaveError('');
+    setSaveModalOpen(true);
   }
 
-  // If the save was gated behind a login prompt, finish the save
-  // automatically once the user actually logs in — no need to make them
-  // click "Save World" a second time.
+  // If the save was gated behind a login prompt, pick up right where we
+  // left off once the user actually logs in — pop the naming modal
+  // instead of making them click "Save World" a second time.
   useEffect(() => {
     if (user && pendingSave) {
       setPendingSave(false);
-      saveWorld();
+      setSaveError('');
+      setSaveModalOpen(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -226,6 +231,14 @@ export default function StepSummary({ onBack, onStartFresh }) {
       </p>
 
       <AuthModal isOpen={authOpen} onClose={() => { setAuthOpen(false); setPendingSave(false); }} initialMode="login" />
+      <SaveWorldModal
+        isOpen={saveModalOpen}
+        defaultName={worldName}
+        saving={saving}
+        error={saveError}
+        onCancel={() => setSaveModalOpen(false)}
+        onConfirm={saveWorld}
+      />
       <Toast show={showSavedToast}>Your world has been saved ✨</Toast>
     </div>
   );
