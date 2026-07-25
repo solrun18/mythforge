@@ -2,29 +2,10 @@ import React from 'react';
 
 /**
  * Small recurring fauna/flora motifs — subtle animated accents rather
- * than illustration set-pieces, per the blueprint's art direction (a
- * moth drifting across the screen, vines as dividers, owls/foxes/stags
- * as background flavor). All purely decorative: aria-hidden, no text.
+ * than illustration set-pieces, per the blueprint's art direction
+ * (vines as dividers, owls/foxes/stags as background flavor). All
+ * purely decorative: aria-hidden, no text.
  */
-
-export function MothDrift({ className = '' }) {
-  return (
-    <svg
-      className={`moth-drift ${className}`.trim()}
-      viewBox="0 0 40 30"
-      width="34"
-      height="26"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <g className="moth-drift__body">
-        <path className="moth-drift__wing moth-drift__wing--l" d="M20,12 C10,2 2,6 4,16 C8,22 16,20 20,14 Z" />
-        <path className="moth-drift__wing moth-drift__wing--r" d="M20,12 C30,2 38,6 36,16 C32,22 24,20 20,14 Z" />
-        <ellipse className="moth-drift__torso" cx="20" cy="15" rx="2" ry="6" />
-      </g>
-    </svg>
-  );
-}
 
 export function OwlAccent({ className = '' }) {
   return (

@@ -124,10 +124,10 @@ button {
 
 /* ---------------------------------------------------------------------
    Background scene — a fixed, full-viewport decorative layer sitting
-   behind the app content: glitter particles, the moth roaming a wide
-   loop, and a few background fauna (owl, stag, fox). Cards/panels have
-   their own opaque backgrounds, so this shows through in the page
-   margins and gaps around them, never on top of readable content.
+   behind the app content: glitter particles and a few background fauna
+   (owl, stag, fox). Cards/panels have their own opaque backgrounds, so
+   this shows through in the page margins and gaps around them, never
+   on top of readable content.
 --------------------------------------------------------------------- */
 .background-scene {
   position: fixed;
@@ -182,32 +182,6 @@ button {
   50% { opacity: 1; transform: translateY(-4px); }
 }
 
-.background-scene__moth {
-  position: absolute;
-  top: 30%;
-  left: 15%;
-  animation: moth-roam 34s ease-in-out infinite;
-}
-.moth-drift__wing { fill: var(--gold); opacity: 0.6; animation: moth-flutter 0.35s ease-in-out infinite alternate; }
-.moth-drift__wing--l { transform-origin: 20px 13px; }
-.moth-drift__wing--r { transform-origin: 20px 13px; animation-delay: 0.05s; }
-.moth-drift__torso { fill: var(--parchment); opacity: 0.7; }
-
-@keyframes moth-flutter {
-  from { transform: scaleX(1); }
-  to { transform: scaleX(0.55); }
-}
-@keyframes moth-roam {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  15% { transform: translate(40vw, 8vh) rotate(8deg); }
-  30% { transform: translate(60vw, 45vh) rotate(-4deg); }
-  45% { transform: translate(75vw, 15vh) rotate(6deg); }
-  60% { transform: translate(35vw, 55vh) rotate(-8deg); }
-  75% { transform: translate(10vw, 30vh) rotate(4deg); }
-  90% { transform: translate(-5vw, 5vh) rotate(-2deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-
 /* Vine dividers — used above/below the main content as a soft section
    break, growing in on first render. */
 .app-divider {
@@ -254,8 +228,6 @@ button {
   .hero-figure__skirt,
   .hero-figure__hair,
   .hero-figure__tilt,
-  .moth-drift__wing,
-  .background-scene__moth,
   .fauna-accent,
   .glitter-dot,
   .app-divider,

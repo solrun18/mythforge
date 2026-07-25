@@ -32,9 +32,9 @@ function AppShell() {
   // Scroll events can fire many times per frame, so the actual style
   // write is batched to at most once per animation frame via rAF.
   //
-  // Separately: a fast scroll is the one moment the ~20 looping
-  // decorative animations (glitter, fauna, moth, hero sway) are
-  // guaranteed to go unnoticed, and it's also exactly when the main
+  // Separately: a fast scroll is the one moment the looping decorative
+  // animations (glitter, fauna, hero sway) are guaranteed to go
+  // unnoticed, and it's also exactly when the main
   // thread is busiest — so an "is-scrolling" class pauses all of them
   // (see App.css) for as long as scrolling is actually happening, and
   // they resume ~200ms after it stops. That trades motion nobody can

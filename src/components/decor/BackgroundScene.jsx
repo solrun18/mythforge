@@ -1,5 +1,5 @@
 import React from 'react';
-import { MothDrift, OwlAccent, StagAccent, FoxAccent } from './FaunaAccents.jsx';
+import { OwlAccent, StagAccent, FoxAccent } from './FaunaAccents.jsx';
 
 // Fixed, hand-placed positions (not randomized on every render) so the
 // scene looks deliberately art-directed rather than noisy. Percentages
@@ -20,9 +20,8 @@ const GLITTER = [
 ];
 
 /**
- * Fixed, full-viewport decorative layer: glitter particles, the moth
- * (now roaming a wide loop rather than pinned to the header), and a
- * few background fauna (owl, stag, fox). Sits behind the app content —
+ * Fixed, full-viewport decorative layer: glitter particles and a few
+ * background fauna (owl, stag, fox). Sits behind the app content —
  * cards and panels have their own opaque backgrounds, so this shows
  * through in the page margins and gaps around them.
  *
@@ -52,7 +51,6 @@ export default function BackgroundScene() {
       <OwlAccent className="background-scene__owl" />
       <StagAccent className="background-scene__stag" />
       <FoxAccent className="background-scene__fox" />
-      <MothDrift className="background-scene__moth" />
     </div>
   );
 }
