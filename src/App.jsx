@@ -8,6 +8,7 @@ import { VineDivider } from './components/decor/FaunaAccents.jsx';
 import BackgroundScene from './components/decor/BackgroundScene.jsx';
 import AccountMenu from './components/auth/AccountMenu.jsx';
 import ChangePasswordForm from './components/auth/ChangePasswordForm.jsx';
+import MyWorldsPage from './components/auth/MyWorldsPage.jsx';
 import StepWorldBuilding from './steps/StepWorldBuilding.jsx';
 import StepMap from './steps/StepMap.jsx';
 import StepMagicSystem from './steps/StepMagicSystem.jsx';
@@ -28,7 +29,13 @@ const STEP_SUMMARY = 7;
 
 function AppShell() {
   const [step, setStep] = useState(STEP_WORLD);
+  const [view, setView] = useState('wizard'); // 'wizard' | 'dashboard'
   const { passwordRecovery, clearPasswordRecovery } = useAuth();
+
+  function handleWorldLoaded() {
+    setView('wizard');
+    setStep(STEP_SUMMARY);
+  }
 
   // Subtle scroll-linked tilt on the hero illustration's cloak — a light
   // touch of the "reacting to cursor/scroll" motion called for in the
@@ -73,7 +80,7 @@ function AppShell() {
   return (
     <>
       <BackgroundScene />
-      <AccountMenu onWorldLoaded={() => setStep(STEP_SUMMARY)} />
+      <AccountMenu onWorldLoaded={handleWorldLoaded} onOpenDashboard={() => setView('dashboard')} />
 
       {passwordRecovery && (
         <div className="modal-overlay">
@@ -101,33 +108,39 @@ function AppShell() {
 
         <VineDivider className="app-divider" />
 
-        <ProgressSteps current={step} onNavigate={setStep} />
+        {view === 'wizard' && <ProgressSteps current={step} onNavigate={setStep} />}
 
         <main className="app-main">
-          <div key={step} className="step-page">
-            {step === STEP_WORLD && <StepWorldBuilding onContinue={() => setStep(STEP_MAP)} />}
-            {step === STEP_MAP && (
-              <StepMap onContinue={() => setStep(STEP_MAGIC)} onBack={() => setStep(STEP_WORLD)} />
-            )}
-            {step === STEP_MAGIC && (
-              <StepMagicSystem onContinue={() => setStep(STEP_CHARACTERS)} onBack={() => setStep(STEP_MAP)} />
-            )}
-            {step === STEP_CHARACTERS && (
-              <StepCharacters onContinue={() => setStep(STEP_PORTRAITS)} onBack={() => setStep(STEP_MAGIC)} />
-            )}
-            {step === STEP_PORTRAITS && (
-              <StepPortraits onContinue={() => setStep(STEP_PLOT)} onBack={() => setStep(STEP_CHARACTERS)} />
-            )}
-            {step === STEP_PLOT && (
-              <StepPlot onContinue={() => setStep(STEP_SCENE)} onBack={() => setStep(STEP_PORTRAITS)} />
-            )}
-            {step === STEP_SCENE && (
-              <StepOpeningScene onContinue={() => setStep(STEP_SUMMARY)} onBack={() => setStep(STEP_PLOT)} />
-            )}
-            {step === STEP_SUMMARY && (
-              <StepSummary onBack={() => setStep(STEP_SCENE)} onStartFresh={() => setStep(STEP_WORLD)} />
-            )}
-          </div>
+          {view === 'dashboard' ? (
+            <div key="dashboard" className="step-page">
+              <MyWorldsPage onBack={() => setView('wizard')} onWorldLoaded={handleWorldLoaded} />
+            </div>
+          ) : (
+            <div key={step} className="step-page">
+              {step === STEP_WORLD && <StepWorldBuilding onContinue={() => setStep(STEP_MAP)} />}
+              {step === STEP_MAP && (
+                <StepMap onContinue={() => setStep(STEP_MAGIC)} onBack={() => setStep(STEP_WORLD)} />
+              )}
+              {step === STEP_MAGIC && (
+                <StepMagicSystem onContinue={() => setStep(STEP_CHARACTERS)} onBack={() => setStep(STEP_MAP)} />
+              )}
+              {step === STEP_CHARACTERS && (
+                <StepCharacters onContinue={() => setStep(STEP_PORTRAITS)} onBack={() => setStep(STEP_MAGIC)} />
+              )}
+              {step === STEP_PORTRAITS && (
+                <StepPortraits onContinue={() => setStep(STEP_PLOT)} onBack={() => setStep(STEP_CHARACTERS)} />
+              )}
+              {step === STEP_PLOT && (
+                <StepPlot onContinue={() => setStep(STEP_SCENE)} onBack={() => setStep(STEP_PORTRAITS)} />
+              )}
+              {step === STEP_SCENE && (
+                <StepOpeningScene onContinue={() => setStep(STEP_SUMMARY)} onBack={() => setStep(STEP_PLOT)} />
+              )}
+              {step === STEP_SUMMARY && (
+                <StepSummary onBack={() => setStep(STEP_SCENE)} onStartFresh={() => setStep(STEP_WORLD)} />
+              )}
+            </div>
+          )}
         </main>
 
         <VineDivider className="app-divider app-divider--footer" />

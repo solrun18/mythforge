@@ -219,9 +219,6 @@ export default function StepSummary({ onBack, onStartFresh }) {
           Couldn't generate the PDF — try again, or use the Markdown export instead.
         </p>
       )}
-      {saveError && (
-        <p className="summary-note summary-note--error">Couldn't save your world — {saveError}</p>
-      )}
 
       <p className="summary-note">
         Mythforge keeps everything in this session only unless you save it to your account.

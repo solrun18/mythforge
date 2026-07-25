@@ -10,8 +10,8 @@ Login is entirely optional — everything else in the app works exactly as befor
 - **Account indicator** — top-right corner, fixed to the viewport so it stays visible while you scroll rather than scrolling away with the header. Shows "Log in" when signed out, or your avatar + name when signed in.
 - **Account dropdown** — click the indicator to edit your full name/about me/photo, change your password, browse worlds you've saved, or log out.
 - **Forgot password** — email-based reset link (Supabase sends the email), which brings you back to the site to set a new password.
-- **Save World** — on the Story Kit screen. If you're not logged in, clicking it opens the login/signup modal first and finishes the save automatically once you're in. If you are logged in, it saves instantly and shows a "Your world has been saved ✨" toast that fades out on its own. Not every world is saved automatically — this is the only way a world gets kept past the current session.
-- **Loading a saved world** — from the account dropdown's "My saved worlds" list, clicking one loads it straight into the Story Kit screen.
+- **Save World** — on the Story Kit screen. If you're not logged in, clicking it opens the login/signup modal first and picks up right where you left off once you're in. Either way, you're then asked to name the world (prefilled with the auto-picked name, so accepting it is one click) before it saves, and a "Your world has been saved ✨" toast fades out on its own once it's done. Not every world is saved automatically — this is the only way a world gets kept past the current session.
+- **My saved worlds** — the account dropdown has a compact list you can load straight from; its "Open dashboard →" link (bottom-right of that panel, opposite the "Back" link) takes you to a full **My Worlds** page — a card grid of everything you've saved, with Load and Delete on each one.
 
 ## What's in this build
 

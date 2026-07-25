@@ -12,7 +12,7 @@ import SavedWorldsList from './SavedWorldsList.jsx';
  * dropdown with profile editing, password change, and saved worlds
  * when signed in.
  */
-export default function AccountMenu({ onWorldLoaded }) {
+export default function AccountMenu({ onWorldLoaded, onOpenDashboard }) {
   const { isConfigured, loading, user, profile, signOut } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -120,7 +120,16 @@ export default function AccountMenu({ onWorldLoaded }) {
             <>
               <h3 className="account-panel__title">My saved worlds</h3>
               <SavedWorldsList onLoadWorld={() => { setMenuOpen(false); onWorldLoaded?.(); }} />
-              <button type="button" className="btn-link account-panel__back" onClick={() => setPanel('menu')}>Back</button>
+              <div className="account-panel__panel-footer">
+                <button type="button" className="btn-link" onClick={() => setPanel('menu')}>Back</button>
+                <button
+                  type="button"
+                  className="btn-link"
+                  onClick={() => { setMenuOpen(false); onOpenDashboard?.(); }}
+                >
+                  Open dashboard →
+                </button>
+              </div>
             </>
           )}
         </div>

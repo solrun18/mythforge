@@ -1039,6 +1039,12 @@ button {
   margin-top: 12px;
 }
 .account-panel__back { margin-top: 12px; }
+.account-panel__panel-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
 
 /* Saved worlds list */
 .saved-worlds-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -1158,6 +1164,28 @@ button {
 }
 
 .profile-edit-form { margin-top: 4px; }
+
+/* My Worlds dashboard page */
+.my-worlds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin: 28px 0;
+}
+.my-worlds-card {
+  background: linear-gradient(160deg, var(--bg-panel), var(--bg-panel-light));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.my-worlds-card h3 { color: var(--gold-bright); font-size: 1.05rem; margin: 0 0 4px; }
+.my-worlds-card__date { color: var(--muted); font-size: 0.8rem; margin: 0 0 14px; }
+.my-worlds-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
 
 /* Toast — "Your world has been saved" */
 .toast {
