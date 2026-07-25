@@ -55,6 +55,11 @@ function reducer(state, action) {
     }
     case 'RESET':
       return initialState;
+    case 'LOAD':
+      // Merge over initialState (rather than replacing outright) so a
+      // saved world from an older shape of the app that's missing a
+      // section still loads without crashing later reads.
+      return { ...initialState, ...action.payload };
     default:
       return state;
   }
@@ -88,6 +93,7 @@ export function useWorldBibleActions() {
     () => ({
       lockField: (section, field, value) => dispatch({ type: 'LOCK_FIELD', section, field, value }),
       reset: () => dispatch({ type: 'RESET' }),
+      load: (payload) => dispatch({ type: 'LOAD', payload }),
     }),
     [dispatch]
   );

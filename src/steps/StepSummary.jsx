@@ -1,8 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useWorldBible, useWorldBibleActions } from '../context/WorldBibleContext.jsx';
 import { worldBibleToMarkdown, downloadMarkdown } from '../lib/exportWorldBible.js';
 import { exportBlocksAsPdf } from '../lib/exportPdf.js';
 import StoryKitPrintSheet from '../components/StoryKitPrintSheet.jsx';
+import Toast from '../components/Toast.jsx';
+import AuthModal from '../components/auth/AuthModal.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { supabase } from '../lib/supabaseClient.js';
 import { SKIPPED } from '../lib/constants.js';
 import { SUBPLOT_TYPES } from '../data/library.js';
 
@@ -25,9 +29,15 @@ function EntryList({ entries }) {
 export default function StepSummary({ onBack, onStartFresh }) {
   const worldBible = useWorldBible();
   const { reset } = useWorldBibleActions();
+  const { isConfigured, user } = useAuth();
   const printSheetRef = useRef(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [pendingSave, setPendingSave] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [showSavedToast, setShowSavedToast] = useState(false);
 
   const worldName = worldBible.worldBuilding.premise?.title || 'My World';
   const slug = (worldBible.worldBuilding.premise?.title || 'mythforge-world').toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -49,6 +59,43 @@ export default function StepSummary({ onBack, onStartFresh }) {
       setPdfLoading(false);
     }
   }
+
+  async function saveWorld() {
+    setSaving(true);
+    setSaveError('');
+    const { error } = await supabase.from('worlds').insert({
+      user_id: user.id,
+      name: worldName,
+      world_bible: worldBible,
+    });
+    setSaving(false);
+    if (error) {
+      setSaveError(error.message);
+      return;
+    }
+    setShowSavedToast(true);
+    setTimeout(() => setShowSavedToast(false), 1600);
+  }
+
+  function handleSaveWorld() {
+    if (!user) {
+      setPendingSave(true);
+      setAuthOpen(true);
+      return;
+    }
+    saveWorld();
+  }
+
+  // If the save was gated behind a login prompt, finish the save
+  // automatically once the user actually logs in — no need to make them
+  // click "Save World" a second time.
+  useEffect(() => {
+    if (user && pendingSave) {
+      setPendingSave(false);
+      saveWorld();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   function handleStartFresh() {
     reset();
@@ -148,6 +195,11 @@ export default function StepSummary({ onBack, onStartFresh }) {
           <button type="button" className="btn btn-ghost-small" onClick={handleStartFresh}>
             Start Fresh
           </button>
+          {isConfigured && (
+            <button type="button" className="btn btn-ghost-small" onClick={handleSaveWorld} disabled={saving}>
+              {saving ? 'Saving…' : 'Save World'}
+            </button>
+          )}
           <button type="button" className="btn btn-ghost-small" onClick={handleExportMarkdown}>
             Export as Markdown
           </button>
@@ -162,12 +214,19 @@ export default function StepSummary({ onBack, onStartFresh }) {
           Couldn't generate the PDF — try again, or use the Markdown export instead.
         </p>
       )}
+      {saveError && (
+        <p className="summary-note summary-note--error">Couldn't save your world — {saveError}</p>
+      )}
 
       <p className="summary-note">
-        Mythforge keeps everything in this session only — nothing is saved once you close the tab.
-        Export before you leave if you want to keep it. Portrait/map images are embedded directly
-        in both export formats, so files may be a few MB if you generated several images.
+        Mythforge keeps everything in this session only unless you save it to your account.
+        {isConfigured ? ' Log in and hit "Save World" to keep it, or export' : ' Export'} before you
+        leave if you want to keep it. Portrait/map images are embedded directly in both export
+        formats, so files may be a few MB if you generated several images.
       </p>
+
+      <AuthModal isOpen={authOpen} onClose={() => { setAuthOpen(false); setPendingSave(false); }} initialMode="login" />
+      <Toast show={showSavedToast}>Your world has been saved ✨</Toast>
     </div>
   );
 }

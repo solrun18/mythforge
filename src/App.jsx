@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { WorldBibleProvider } from './context/WorldBibleContext.jsx';
 import { GenerationModeProvider } from './context/GenerationModeContext.jsx';
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import ProgressSteps from './components/ProgressSteps.jsx';
 import HeroFigure from './components/decor/HeroFigure.jsx';
 import { VineDivider } from './components/decor/FaunaAccents.jsx';
 import BackgroundScene from './components/decor/BackgroundScene.jsx';
+import AccountMenu from './components/auth/AccountMenu.jsx';
+import ChangePasswordForm from './components/auth/ChangePasswordForm.jsx';
 import StepWorldBuilding from './steps/StepWorldBuilding.jsx';
 import StepMap from './steps/StepMap.jsx';
 import StepMagicSystem from './steps/StepMagicSystem.jsx';
@@ -25,6 +28,7 @@ const STEP_SUMMARY = 7;
 
 function AppShell() {
   const [step, setStep] = useState(STEP_WORLD);
+  const { passwordRecovery, clearPasswordRecovery } = useAuth();
 
   // Subtle scroll-linked tilt on the hero illustration's cloak — a light
   // touch of the "reacting to cursor/scroll" motion called for in the
@@ -69,6 +73,17 @@ function AppShell() {
   return (
     <>
       <BackgroundScene />
+      <AccountMenu onWorldLoaded={() => setStep(STEP_SUMMARY)} />
+
+      {passwordRecovery && (
+        <div className="modal-overlay">
+          <div className="modal auth-modal" role="dialog" aria-modal="true">
+            <h2>Set a new password</h2>
+            <ChangePasswordForm recoveryMode onDone={clearPasswordRecovery} />
+          </div>
+        </div>
+      )}
+
       <div className="app-shell">
         <header className="app-header">
           <div className="app-header__hero">
@@ -123,7 +138,6 @@ function AppShell() {
             <img src="/profile.png" alt="Sólrún" className="app-footer__photo" />
             <div className="app-footer__about-text">
               <span className="app-footer__credit">Made by Sólrún</span>
-              </div><div className="app-footer__about-text">
               <a href="mailto:solrunasta@hotmail.com">✉ solrunasta@hotmail.com</a>
               <a href="https://is.linkedin.com/in/solrunasta" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
             </div>
@@ -136,10 +150,12 @@ function AppShell() {
 
 export default function App() {
   return (
-    <GenerationModeProvider>
-      <WorldBibleProvider>
-        <AppShell />
-      </WorldBibleProvider>
-    </GenerationModeProvider>
+    <AuthProvider>
+      <GenerationModeProvider>
+        <WorldBibleProvider>
+          <AppShell />
+        </WorldBibleProvider>
+      </GenerationModeProvider>
+    </AuthProvider>
   );
 }

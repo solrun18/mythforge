@@ -1,6 +1,17 @@
-# Mythforge — Phase 3 complete
+# Mythforge — Phase 4 in progress
 
-Full guided flow now implemented per the [blueprint](./BLUEPRINT.md): World Building → Map → Magic System → Characters → Portraits → Plot Points → Opening Scene (bonus) → Story Kit summary/export.
+Full guided flow implemented per the [blueprint](./BLUEPRINT.md): World Building → Map → Magic System → Characters → Portraits → Plot Points → Opening Scene (bonus) → Story Kit summary/export. Phase 4 (accounts + saved worlds) is layered on top — see below.
+
+## Accounts, login, and saved worlds (Phase 4)
+
+Login is entirely optional — everything else in the app works exactly as before without ever signing up. Runs on [Supabase](https://supabase.com); see **SUPABASE_SETUP.md** for the one-time setup (create a free project, run the provided SQL, add two env vars). Without that set up, the app just hides the account features gracefully instead of breaking.
+
+- **Sign up** — email (used as the username), password + verify password (masked, standard password fields), full name, an optional "about me", and an optional profile picture.
+- **Account indicator** — top-right corner, fixed to the viewport so it stays visible while you scroll rather than scrolling away with the header. Shows "Log in" when signed out, or your avatar + name when signed in.
+- **Account dropdown** — click the indicator to edit your full name/about me/photo, change your password, browse worlds you've saved, or log out.
+- **Forgot password** — email-based reset link (Supabase sends the email), which brings you back to the site to set a new password.
+- **Save World** — on the Story Kit screen. If you're not logged in, clicking it opens the login/signup modal first and finishes the save automatically once you're in. If you are logged in, it saves instantly and shows a "Your world has been saved ✨" toast that fades out on its own. Not every world is saved automatically — this is the only way a world gets kept past the current session.
+- **Loading a saved world** — from the account dropdown's "My saved worlds" list, clicking one loads it straight into the Story Kit screen.
 
 ## What's in this build
 
@@ -51,13 +62,15 @@ npm install
 npm run dev
 ```
 
-New dependencies were added for the PDF export (`jspdf`, `html2canvas-pro`) — run `npm install` again after pulling this update to fetch them.
+A new dependency was added for accounts (`@supabase/supabase-js`) — run `npm install` again after pulling this update to fetch it.
 
-Copy `.env.example` to `.env` and add your own keys to unlock real generation:
+Copy `.env.example` to `.env` and add your own keys to unlock real generation and accounts:
 
 ```
-ANTHROPIC_API_KEY=sk-ant-...      # text generation (world, magic, characters, plot, opening scene)
-OPENAI_API_KEY=sk-...             # image generation (map, portraits)
+ANTHROPIC_API_KEY=sk-ant-...          # text generation (world, magic, characters, plot, opening scene)
+OPENAI_API_KEY=sk-...                 # image generation (map, portraits)
+VITE_SUPABASE_URL=...                 # accounts/login/saved worlds — see SUPABASE_SETUP.md
+VITE_SUPABASE_ANON_KEY=...
 ```
 
 Get an Anthropic key at [console.anthropic.com](https://console.anthropic.com) and an OpenAI key at [platform.openai.com](https://platform.openai.com). Add them yourself, locally or in Vercel's dashboard — don't paste them into chat with me.
